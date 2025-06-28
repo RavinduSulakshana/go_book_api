@@ -23,5 +23,8 @@ func InitDB() {
 		log.Fatal("failed to connect to database", err)
 	}
 	//migrate the schema
+	if err := DB.AutoMigrate(&Book{}); err != nil {
+		log.Fatal("Failed to migrate schema", err)
+	}
 
 }
