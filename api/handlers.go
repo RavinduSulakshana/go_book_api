@@ -2,8 +2,10 @@ package api
 
 import (
 	"log"
+	"net/http"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -12,8 +14,8 @@ import (
 var DB *gorm.DB
 
 func InitDB() {
-	err := godotenv.LOAD()
-	if err != nill {
+	err := godotenv.Load()
+	if err != nil {
 		log.Fatal("failed to connect database", err)
 	}
 
@@ -27,4 +29,32 @@ func InitDB() {
 		log.Fatal("Failed to migrate schema", err)
 	}
 
+}
+
+func CreateBook(c *gin.Context) {
+	var book Book
+
+	//bind the request body
+	if err := c.ShouldBindJSON(&book); err != nil {
+		ResponseJSON(c, http.StatusBadRequest, "invalid input", nil)
+		return
+	}
+
+	DB.Create(&book)
+	ResponseJSON(c, http.StatusCreated, "Book created successfully", book)
+}
+
+func GetBooks(c *gin.Context) {
+	var books []Book
+	DB.Find(&books)
+	ResponseJSON(c, http.StatusOK, "Books retrieved successfully", books)
+}
+
+func GetBook(c *gin.Context) {
+	var book Book
+	if err := DB.First(&book, c.Param("id")).Error; err != nil {
+		ResponseJSON(c, http.StatusNotFound, "Book Not Found", nil)
+		return
+	}
+	ResponseJSON(c, http.StatusOk, "book retrieved successfully", book)
 }
