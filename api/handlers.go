@@ -56,5 +56,21 @@ func GetBook(c *gin.Context) {
 		ResponseJSON(c, http.StatusNotFound, "Book Not Found", nil)
 		return
 	}
-	ResponseJSON(c, http.StatusOk, "book retrieved successfully", book)
+	ResponseJSON(c, http.StatusOK, "book retrieved successfully", book)
+}
+
+func UpdateBook(c *gin.Context) {
+	var book Book
+	if err := DB.First(&book, c.Param("id")).Error; err != nil {
+		ResponseJSON(c, http.StatusBadRequest, "invalid Input", nil)
+		return
+	}
+	DB.Save(&book)
+	ResponseJSON(c, http.StatusOK, "Book updated successfully", book)
+}
+func DeleteBook(c *gin.Context) {
+	var book Book
+	if err := DB.Delete(&book, c.Params("id")).Error; err != nil {
+		ResponseJSON(c.http.StatusNotFound, "Book Not Found", nil)
+	}
 }
