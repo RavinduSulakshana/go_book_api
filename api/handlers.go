@@ -16,7 +16,7 @@ var DB *gorm.DB
 func InitDB() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("failed to connect database", err)
+		log.Fatal("failed to load .env files", err)
 	}
 
 	dsn := os.Getenv("DB_URL")
@@ -62,7 +62,7 @@ func GetBook(c *gin.Context) {
 func UpdateBook(c *gin.Context) {
 	var book Book
 	if err := DB.First(&book, c.Param("id")).Error; err != nil {
-		ResponseJSON(c, http.StatusBadRequest, "invalid Input", nil)
+		ResponseJSON(c, http.StatusNotFound, "invalid Input", nil)
 		return
 	}
 	// bind the request body
